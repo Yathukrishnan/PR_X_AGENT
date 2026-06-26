@@ -17,8 +17,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Generator
 
-import libsql
 from dotenv import load_dotenv
+
+from shared.db import turso_client
 
 # Load .env so the module is self-sufficient when imported directly (e.g. a bare
 # `python -c "from linkedin.db import LinkedInDatabase"`), not only via shared.config.settings.
@@ -112,12 +113,9 @@ class LinkedInDatabase:
             raise RuntimeError("TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be set "
                                "in .env (same values as KA017 / the dashboard).")
         _DATA_DIR.mkdir(exist_ok=True)
-        connect_kwargs: dict[str, Any] = dict(
-            sync_url=TURSO_DATABASE_URL, auth_token=TURSO_AUTH_TOKEN
+        self._conn_obj = turso_client.connect(
+            REPLICA_PATH, TURSO_DATABASE_URL, TURSO_AUTH_TOKEN, sync_interval=sync_interval
         )
-        if sync_interval is not None:
-            connect_kwargs["sync_interval"] = sync_interval
-        self._conn_obj = libsql.connect(str(REPLICA_PATH), **connect_kwargs)
         self._conn_obj.sync()
         self._init_schema()
         self._migrate_columns()

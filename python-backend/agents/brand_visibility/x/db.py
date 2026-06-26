@@ -12,8 +12,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Any, Generator
 
-import libsql
-
+from shared.db import turso_client
 from shared.config.settings import (
     REPLICA_PATH,
     TURSO_AUTH_TOKEN,
@@ -161,10 +160,10 @@ class Database:
                 "Copy them from the dashboard's .env.local."
             )
         self.replica_path = str(REPLICA_PATH)
-        self._conn_obj = libsql.connect(
+        self._conn_obj = turso_client.connect(
             self.replica_path,
-            sync_url=TURSO_DATABASE_URL,
-            auth_token=TURSO_AUTH_TOKEN,
+            TURSO_DATABASE_URL,
+            TURSO_AUTH_TOKEN,
             sync_interval=TURSO_SYNC_INTERVAL,
         )
         self._conn_obj.sync()

@@ -17,16 +17,10 @@ import time
 from pathlib import Path
 from typing import Any, Literal
 
-import requests
 from pydantic import BaseModel, ValidationError, field_validator
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 
 from shared.config.settings import OPENROUTER_API_KEY, OPENROUTER_BASE
+from shared.llm import openrouter
 from agents.brand_visibility.linkedin.db import LinkedInDatabase
 
 logger = logging.getLogger(__name__)
@@ -127,16 +121,6 @@ def compute_cost(input_tokens: int, output_tokens: int, model: str) -> float:
 # OpenRouter call (transient-only retry)
 # --------------------------------------------------------------------------
 
-class _ServerError(Exception):
-    pass
-
-
-@retry(
-    retry=retry_if_exception_type((_ServerError, requests.exceptions.Timeout)),
-    stop=stop_after_attempt(4),
-    wait=wait_exponential(multiplier=2, min=2, max=30),
-    reraise=True,
-)
 def _post_openrouter(user_msg: str) -> dict:
     payload = {
         "model": MODEL,
@@ -149,21 +133,9 @@ def _post_openrouter(user_msg: str) -> dict:
             {"role": "user", "content": user_msg},
         ],
     }
-    resp = requests.post(
-        f"{OPENROUTER_BASE}/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://kiteai.dev",
-            "X-Title": "KA018",
-        },
-        json=payload,
-        timeout=60,
+    return openrouter.chat_completion(
+        OPENROUTER_BASE, OPENROUTER_API_KEY, payload, title="KA018"
     )
-    if 500 <= resp.status_code < 600:
-        raise _ServerError(f"{resp.status_code} from OpenRouter")
-    resp.raise_for_status()  # other 4xx -> HTTPError, not retried
-    return resp.json()
 
 
 def classify_one(post: dict) -> LinkedInClassifierOutput:

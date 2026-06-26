@@ -9,7 +9,6 @@ import logging
 import time
 from typing import Any
 
-import requests
 from pydantic import BaseModel, Field, ValidationError
 
 from shared.config.settings import (
@@ -18,6 +17,7 @@ from shared.config.settings import (
     OPENROUTER_API_KEY,
     OPENROUTER_BASE,
 )
+from shared.llm import openrouter
 from agents.brand_visibility.x.db import Database
 
 logger = logging.getLogger(__name__)
@@ -145,32 +145,14 @@ def classify_one(tweet: dict, system_prompt: str | None = None) -> ClassifierOut
     }
 
     try:
-        resp = requests.post(
-            f"{OPENROUTER_BASE}/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://kiteai.dev",
-                "X-Title": "KA017",
-            },
-            json=payload,
-            timeout=60,
+        body = openrouter.chat_completion(
+            OPENROUTER_BASE, OPENROUTER_API_KEY, payload, title="KA017"
         )
-    except requests.RequestException as exc:
+    except Exception as exc:
         logger.error("OpenRouter request error for tweet %s: %s", tweet_id, exc)
         return None
 
-    if resp.status_code != 200:
-        logger.error(
-            "OpenRouter returned status %s for tweet %s: %s",
-            resp.status_code,
-            tweet_id,
-            resp.text[:200],
-        )
-        return None
-
     try:
-        body = resp.json()
         raw_content = body["choices"][0]["message"]["content"]
         raw_obj = json.loads(raw_content)
         result = ClassifierOutput.model_validate(raw_obj)
