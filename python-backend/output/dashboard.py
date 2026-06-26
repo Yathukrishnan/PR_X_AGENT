@@ -35,6 +35,7 @@ from config.settings import (
 )
 
 import output.dashboard_queries as q
+import output.ka018_page as ka018
 import output.prompt_manager as pm
 import output.scheduler_manager as sm
 from output import dashboard_styles as sty
@@ -140,6 +141,7 @@ def sidebar() -> str:
                 "Scheduler",
                 "Keywords",
                 "Costs & Health",
+                "KA018 LinkedIn",
             ],
             label_visibility="collapsed",
         )
@@ -1476,6 +1478,7 @@ PAGES = {
     "Scheduler": page_scheduler,
     "Keywords": page_keywords,
     "Costs & Health": page_costs_health,
+    "KA018 LinkedIn": ka018.render,
 }
 
 
