@@ -21,15 +21,15 @@ def test_provider_factory_validates_env():
     import sys
 
     # Evict the cached module so the next import re-runs validation
-    sys.modules.pop("config.settings", None)
+    sys.modules.pop("shared.config.settings", None)
     with patch.dict(os.environ, {"SCRAPER_PROVIDER": "made_up_provider"}):
         with pytest.raises(ValueError, match="SCRAPER_PROVIDER"):
-            import config.settings  # noqa: F401
+            import shared.config.settings  # noqa: F401
 
     # Restore a valid cached module for subsequent tests
-    sys.modules.pop("config.settings", None)
+    sys.modules.pop("shared.config.settings", None)
     with patch.dict(os.environ, {"SCRAPER_PROVIDER": "x_official"}):
-        import config.settings  # noqa: F401
+        import shared.config.settings  # noqa: F401
 
 
 # ---------------------------------------------------------------------------

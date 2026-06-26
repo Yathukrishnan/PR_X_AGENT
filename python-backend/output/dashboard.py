@@ -26,7 +26,7 @@ if str(_ROOT) not in sys.path:
 import pandas as pd
 import streamlit as st
 
-from config.settings import (
+from shared.config.settings import (
     CLASSIFIER_MODEL,
     DRAFTER_MODEL,
     MAX_API_CALLS_PER_RUN,

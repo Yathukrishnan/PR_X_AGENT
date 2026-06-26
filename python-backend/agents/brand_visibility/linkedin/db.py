@@ -21,7 +21,7 @@ import libsql
 from dotenv import load_dotenv
 
 # Load .env so the module is self-sufficient when imported directly (e.g. a bare
-# `python -c "from linkedin.db import LinkedInDatabase"`), not only via config.settings.
+# `python -c "from linkedin.db import LinkedInDatabase"`), not only via shared.config.settings.
 load_dotenv()
 
 logger = logging.getLogger(__name__)

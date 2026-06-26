@@ -18,7 +18,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from config.settings import DATA_DIR, LOG_PATH
+from shared.config.settings import DATA_DIR, LOG_PATH
 
 # ---------------------------------------------------------------------------
 # Logging — structured, rotating file + stdout
@@ -81,7 +81,7 @@ def tick(tick_number: int, mode: str = "all", dry_run: bool = False) -> dict:
     start = datetime.now(timezone.utc)
     logger.info("=== Tick %d start (%s) dry_run=%s mode=%s ===", tick_number, start.isoformat(), dry_run, mode)
 
-    from config.settings import MAX_API_CALLS_PER_RUN
+    from shared.config.settings import MAX_API_CALLS_PER_RUN
     from agents.brand_visibility.x.x_scraper import reset_call_budget
     db = Database()
     reset_call_budget(MAX_API_CALLS_PER_RUN)

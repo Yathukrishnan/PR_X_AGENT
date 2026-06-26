@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 # Force load the .env file
 load_dotenv()
 
-from config.settings import (
+from shared.config.settings import (
     MAX_REPLY_EXPANSIONS_PER_TICK,
     MAX_REPLY_TREE_PAGES,
     SCRAPE_SLEEP_SECONDS,

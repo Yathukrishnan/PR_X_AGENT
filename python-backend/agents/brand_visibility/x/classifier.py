@@ -12,7 +12,7 @@ from typing import Any
 import requests
 from pydantic import BaseModel, Field, ValidationError
 
-from config.settings import (
+from shared.config.settings import (
     CLASSIFIER_MODEL,
     LLM_SLEEP_SECONDS,
     OPENROUTER_API_KEY,

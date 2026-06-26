@@ -19,7 +19,7 @@ from typing import Any
 import requests
 from pydantic import BaseModel, ValidationError
 
-from config.settings import DRAFTER_MODEL, LLM_SLEEP_SECONDS, OPENROUTER_API_KEY, OPENROUTER_BASE
+from shared.config.settings import DRAFTER_MODEL, LLM_SLEEP_SECONDS, OPENROUTER_API_KEY, OPENROUTER_BASE
 from agents.brand_visibility.x.db import Database
 
 logger = logging.getLogger(__name__)

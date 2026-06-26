@@ -13,7 +13,7 @@ from typing import Any
 
 import streamlit as st
 
-from config.settings import MAX_API_CALLS_PER_RUN
+from shared.config.settings import MAX_API_CALLS_PER_RUN
 from agents.brand_visibility.x.db import Database
 
 

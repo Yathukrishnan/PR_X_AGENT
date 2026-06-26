@@ -26,7 +26,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from config.settings import OPENROUTER_API_KEY, OPENROUTER_BASE
+from shared.config.settings import OPENROUTER_API_KEY, OPENROUTER_BASE
 from agents.brand_visibility.linkedin.db import LinkedInDatabase
 
 logger = logging.getLogger(__name__)

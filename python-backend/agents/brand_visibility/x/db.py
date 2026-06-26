@@ -14,7 +14,7 @@ from typing import Any, Generator
 
 import libsql
 
-from config.settings import (
+from shared.config.settings import (
     REPLICA_PATH,
     TURSO_AUTH_TOKEN,
     TURSO_DATABASE_URL,
