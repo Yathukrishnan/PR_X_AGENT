@@ -29,33 +29,51 @@ classifier.py ── enriches → SQLite (per-tweet class + intent + score)
         └──→ Loop 2: signal feed → Dashboard Tab 1
 ```
 
-## File layout
+## File layout (agent-based structure, as of the 2026-06 reorg)
+
+The codebase was reorganised from flat `ingestion/`+`processing/`+root files into
+per-agent packages under `agents/`, with cross-agent utilities under `shared/`.
 
 ```
-ka017-agent/
+python-backend/
 ├── CLAUDE.md                       (this file)
-├── README.md
-├── .env.example, .env (gitignored), .gitignore
-├── requirements.txt
-├── orchestrator.py                 (Prompt 5)
-├── config/
-│   ├── genesis_lexicon.json        (Prompt 1)
-│   └── settings.py                 (Prompt 1)
-├── ingestion/
-│   ├── db.py                       (Prompt 2)
-│   └── x_scraper.py                (Prompt 2)
-├── processing/
-│   └── classifier.py               (Prompt 3a)
-├── output/
-│   ├── post_drafter.py             (Prompt 3b)
-│   └── dashboard.py                (Prompt 4)
-├── scripts/
-│   └── generate_lexicon.py         (generates genesis_lexicon.json)
+├── README.md, requirements.txt, .env.example
+├── shared/                         (cross-agent utilities)
+│   ├── config/settings.py          (env loading; was config/settings.py)
+│   ├── db/turso_client.py          (libsql embedded-replica connect helper)
+│   └── llm/openrouter.py           (OpenRouter chat-completion wrapper + retry)
+├── agents/
+│   └── brand_visibility/
+│       ├── x/                      (KA017 — X/Twitter agent)
+│       │   ├── db.py               (was ingestion/db.py)
+│       │   ├── classifier.py       (was processing/classifier.py)
+│       │   ├── x_scraper.py        (sweep logic; was ingestion/x_scraper.py)
+│       │   ├── lexicon.py          (was ingestion/lexicon.py)
+│       │   ├── providers/          (twitter241, twitter_api45, x_official, base, _http)
+│       │   ├── promoter_tier.py, reputation.py   (was processing/*)
+│       │   ├── post_drafter.py     (was output/post_drafter.py)
+│       │   ├── orchestrator.py     (was root orchestrator.py)
+│       │   └── scheduler.py        (was root scheduler.py)
+│       └── linkedin/               (KA018 — LinkedIn agent)
+│           ├── scraper.py, classifier.py, db.py, orchestrator.py
+├── config/                         (KEPT: prompts/, genesis_lexicon.json)
+├── output/                         (Streamlit dashboard — dashboard.py, ka018_page.py, ...)
+├── scripts/                        (generate_lexicon.py, backfill_*, sweep_10_test.py, ...)
 ├── tests/
-└── data/                           (gitignored — DB + logs live here)
-    ├── ka017_memory.db
-    └── ka017.log
+└── data/                           (gitignored — replica .db files + logs)
+    ├── ka017_replica.db
+    └── ka018_replica.db
 ```
+
+Import roots: `shared.config.settings`, `shared.db.turso_client`,
+`shared.llm.openrouter`, `agents.brand_visibility.x.*`,
+`agents.brand_visibility.linkedin.*`. Run the X orchestrator with
+`python -m agents.brand_visibility.x.orchestrator`; LinkedIn with
+`python -m agents.brand_visibility.linkedin.orchestrator`.
+
+KA018 (LinkedIn) is the sibling agent: scrapes LinkedIn posts (Fresh LinkedIn
+Scraper API), classifies them into TIER_1_ENGAGE … TIER_4_NOISE, surfaced on the
+dashboard's "KA018 LinkedIn" page.
 
 ## Conventions
 
@@ -130,7 +148,7 @@ twitter241's /user-tweets and /user-replies-v2 require numeric user IDs, not han
 ## Demo dashboard (output/dashboard.py)
 
 The Streamlit dashboard is split across `output/dashboard.py` (6-page UI),
-`output/dashboard_queries.py` (cached Turso reads via `ingestion.db.Database`),
+`output/dashboard_queries.py` (cached Turso reads via `agents.brand_visibility.x.db.Database`),
 and `output/dashboard_styles.py` (CSS + per-class colour palette). Constraints:
 
 - Five of six pages (Overview, Signal Feed, Workflow, Keywords, Costs & Health)

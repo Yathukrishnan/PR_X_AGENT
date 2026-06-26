@@ -26,7 +26,7 @@ if str(_ROOT) not in sys.path:
 import pandas as pd
 import streamlit as st
 
-from config.settings import (
+from shared.config.settings import (
     CLASSIFIER_MODEL,
     DRAFTER_MODEL,
     MAX_API_CALLS_PER_RUN,
@@ -35,6 +35,7 @@ from config.settings import (
 )
 
 import output.dashboard_queries as q
+import output.ka018_page as ka018
 import output.prompt_manager as pm
 import output.scheduler_manager as sm
 from output import dashboard_styles as sty
@@ -140,6 +141,7 @@ def sidebar() -> str:
                 "Scheduler",
                 "Keywords",
                 "Costs & Health",
+                "KA018 LinkedIn",
             ],
             label_visibility="collapsed",
         )
@@ -650,7 +652,7 @@ _PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 
 def _pending_count() -> int:
     """Short-lived count read. Caller must ensure no subprocess is writing."""
-    from ingestion.db import Database
+    from agents.brand_visibility.x.db import Database
 
     db = Database()
     try:
@@ -663,7 +665,7 @@ def _pending_count() -> int:
 
 def _state_counts() -> tuple[int, int]:
     """Read (classified, pending) in ONE short-lived connection to limit churn."""
-    from ingestion.db import Database
+    from agents.brand_visibility.x.db import Database
 
     db = Database()
     try:
@@ -814,7 +816,7 @@ def show_collection_panel() -> None:
                     f"=== Starting keyword sweep (type={sweep_type}, max_pages={max_pages}, "
                     f"classes={class_arg or 'all'}) ==="
                 )
-                kw_cmd = [sys.executable, "orchestrator.py", "--once", "--mode", "keywords",
+                kw_cmd = [sys.executable, "-m", "agents.brand_visibility.x.orchestrator", "--once", "--mode", "keywords",
                           "--sweep-type", sweep_type, "--max-pages", str(max_pages)]
                 if class_arg:
                     kw_cmd += ["--classes", class_arg]
@@ -827,7 +829,7 @@ def show_collection_panel() -> None:
                     )
                 st.session_state.collect_logs.append("=== Starting influencer sweep ===")
                 run_orchestrator_command(
-                    [sys.executable, "orchestrator.py", "--once", "--mode", "influencers"],
+                    [sys.executable, "-m", "agents.brand_visibility.x.orchestrator", "--once", "--mode", "influencers"],
                     "collect_logs", max_seconds=1500,
                 )
                 st.session_state.collect_logs.append("=== Collection complete ===")
@@ -888,7 +890,7 @@ def show_classification_panel() -> None:
                         f"=== Batch {batch_num} of {max_batches} ==="
                     )
                     exit_code, _ = run_orchestrator_command(
-                        [sys.executable, "orchestrator.py", "--once", "--mode", "classify"],
+                        [sys.executable, "-m", "agents.brand_visibility.x.orchestrator", "--once", "--mode", "classify"],
                         "classify_logs", max_seconds=900,
                     )
                     if exit_code != 0:
@@ -1296,7 +1298,7 @@ def page_classifier_prompt() -> None:
         else:
             with st.spinner("Calling classifier..."):
                 try:
-                    from processing.classifier import classify_one
+                    from agents.brand_visibility.x.classifier import classify_one
                     result = classify_one(
                         {
                             "tweet_id": "preview",
@@ -1476,6 +1478,7 @@ PAGES = {
     "Scheduler": page_scheduler,
     "Keywords": page_keywords,
     "Costs & Health": page_costs_health,
+    "KA018 LinkedIn": ka018.render,
 }
 
 

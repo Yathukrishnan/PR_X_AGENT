@@ -42,8 +42,10 @@ MAX_REPLY_EXPANSIONS_PER_TICK = 5
 SCRAPE_SLEEP_SECONDS = 5
 LLM_SLEEP_SECONDS = 3
 
-# Paths
-REPO_ROOT = Path(__file__).parent.parent
+# Paths — settings.py now lives at shared/config/, so the python-backend root is
+# two levels up (shared/config/settings.py -> parents[2]). config/ and data/
+# stay at that root.
+REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "data"
 DB_PATH = DATA_DIR / "ka017_memory.db"
 LEXICON_PATH = REPO_ROOT / "config" / "genesis_lexicon.json"

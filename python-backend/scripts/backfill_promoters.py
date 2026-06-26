@@ -12,8 +12,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ingestion.db import Database
-from processing.promoter_tier import compute_tier, infer_promotion_kind
+from agents.brand_visibility.x.db import Database
+from agents.brand_visibility.x.promoter_tier import compute_tier, infer_promotion_kind
 
 
 def main() -> None:

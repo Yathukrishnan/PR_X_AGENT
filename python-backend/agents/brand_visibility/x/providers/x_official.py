@@ -10,8 +10,8 @@ from typing import Optional
 
 import requests
 
-from ingestion.providers import NormalizedTweet, ProviderCapabilities, ScraperProvider
-from ingestion.providers._http import safe_get
+from agents.brand_visibility.x.providers import NormalizedTweet, ProviderCapabilities, ScraperProvider
+from agents.brand_visibility.x.providers._http import safe_get
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ EXPANSIONS = "author_id"
 
 class XOfficialProvider(ScraperProvider):
     def __init__(self) -> None:
-        from config.settings import X_BEARER_TOKEN
+        from shared.config.settings import X_BEARER_TOKEN
         self._bearer_token = X_BEARER_TOKEN
         self._session = requests.Session()
         self._session.headers.update({"Authorization": f"Bearer {self._bearer_token}"})

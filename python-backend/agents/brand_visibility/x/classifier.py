@@ -1,6 +1,6 @@
 """
 Classify PENDING tweets via OpenRouter (Google Gemini Flash 2.5).
-Usage: python -m processing.classifier
+Usage: python -m agents.brand_visibility.x.classifier
 """
 from __future__ import annotations
 
@@ -9,16 +9,16 @@ import logging
 import time
 from typing import Any
 
-import requests
 from pydantic import BaseModel, Field, ValidationError
 
-from config.settings import (
+from shared.config.settings import (
     CLASSIFIER_MODEL,
     LLM_SLEEP_SECONDS,
     OPENROUTER_API_KEY,
     OPENROUTER_BASE,
 )
-from ingestion.db import Database
+from shared.llm import openrouter
+from agents.brand_visibility.x.db import Database
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path
 
-_PROMPTS_DIR = Path(__file__).resolve().parent.parent / "config" / "prompts"
+# config/ lives at the python-backend root: agents/brand_visibility/x/ -> parents[3]
+_PROMPTS_DIR = Path(__file__).resolve().parents[3] / "config" / "prompts"
 _ACTIVE_POINTER = _PROMPTS_DIR / "active.txt"
 _FALLBACK_PROMPT = (
     "You are an analyst classifying X (Twitter) posts for voice AI market relevance. "
@@ -144,32 +145,14 @@ def classify_one(tweet: dict, system_prompt: str | None = None) -> ClassifierOut
     }
 
     try:
-        resp = requests.post(
-            f"{OPENROUTER_BASE}/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://kiteai.dev",
-                "X-Title": "KA017",
-            },
-            json=payload,
-            timeout=60,
+        body = openrouter.chat_completion(
+            OPENROUTER_BASE, OPENROUTER_API_KEY, payload, title="KA017"
         )
-    except requests.RequestException as exc:
+    except Exception as exc:
         logger.error("OpenRouter request error for tweet %s: %s", tweet_id, exc)
         return None
 
-    if resp.status_code != 200:
-        logger.error(
-            "OpenRouter returned status %s for tweet %s: %s",
-            resp.status_code,
-            tweet_id,
-            resp.text[:200],
-        )
-        return None
-
     try:
-        body = resp.json()
         raw_content = body["choices"][0]["message"]["content"]
         raw_obj = json.loads(raw_content)
         result = ClassifierOutput.model_validate(raw_obj)
@@ -234,7 +217,7 @@ def classify_pending(
         # break classification, so it is fully wrapped.
         if result.intent_signal == "MARKETING":
             try:
-                from processing.promoter_tier import compute_tier, infer_promotion_kind
+                from agents.brand_visibility.x.promoter_tier import compute_tier, infer_promotion_kind
 
                 tier = compute_tier(
                     author_followers=tweet.get("author_followers") or 0,

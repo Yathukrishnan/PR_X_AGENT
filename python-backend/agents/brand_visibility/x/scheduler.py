@@ -20,10 +20,12 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# Bootstrap so this script can be run from anywhere
-_HERE = Path(__file__).resolve().parent
-if str(_HERE) not in sys.path:
-    sys.path.insert(0, str(_HERE))
+# Bootstrap so this script can be run from anywhere. The python-backend root is
+# 3 levels up (agents/brand_visibility/x/scheduler.py -> parents[3]); add it to
+# sys.path so output/, config/, and agents/ resolve.
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 from output.scheduler_manager import (
     load_schedule,
@@ -37,7 +39,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("scheduler")
 
-_REPO_ROOT = Path(__file__).resolve().parent
 _PYTHON = sys.executable
 
 
@@ -78,7 +79,9 @@ def _fire_run(modes: list[str]) -> str:
     overall = "success"
     for mode in modes:
         logger.info("Firing orchestrator: mode=%s", mode)
-        cmd = [_PYTHON, str(_REPO_ROOT / "orchestrator.py"), "--once", "--mode", mode]
+        # Run the orchestrator as a module (its package imports need the repo
+        # root on sys.path; -m with cwd=_REPO_ROOT provides that).
+        cmd = [_PYTHON, "-m", "agents.brand_visibility.x.orchestrator", "--once", "--mode", mode]
         try:
             proc = subprocess.run(
                 cmd, cwd=str(_REPO_ROOT), capture_output=False, timeout=1800,

@@ -21,8 +21,8 @@ from typing import Any, Optional
 
 import requests
 
-from ingestion.providers import NormalizedTweet, ProviderCapabilities, ScraperProvider
-from ingestion.providers._http import safe_get
+from agents.brand_visibility.x.providers import NormalizedTweet, ProviderCapabilities, ScraperProvider
+from agents.brand_visibility.x.providers._http import safe_get
 
 logger = logging.getLogger(__name__)
 

@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from config.settings import LEXICON_PATH
+from shared.config.settings import LEXICON_PATH
 
 logger = logging.getLogger(__name__)
 

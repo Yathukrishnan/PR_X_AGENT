@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import libsql
 
-from config.settings import (
+from shared.config.settings import (
     DB_PATH,
     REPLICA_PATH,
     TURSO_AUTH_TOKEN,

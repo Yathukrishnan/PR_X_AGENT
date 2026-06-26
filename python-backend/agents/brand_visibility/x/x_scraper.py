@@ -2,11 +2,11 @@
 X scraper — provider-agnostic. Backend selected via SCRAPER_PROVIDER env var.
 
 Usage:
-  python -m ingestion.x_scraper --mode keywords
-  python -m ingestion.x_scraper --mode influencers
-  python -m ingestion.x_scraper --mode replies
-  python -m ingestion.x_scraper --mode keywords --dry-run
-  python -m ingestion.x_scraper --mode keywords --limit 3
+  python -m agents.brand_visibility.x.x_scraper --mode keywords
+  python -m agents.brand_visibility.x.x_scraper --mode influencers
+  python -m agents.brand_visibility.x.x_scraper --mode replies
+  python -m agents.brand_visibility.x.x_scraper --mode keywords --dry-run
+  python -m agents.brand_visibility.x.x_scraper --mode keywords --limit 3
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 # Force load the .env file
 load_dotenv()
 
-from config.settings import (
+from shared.config.settings import (
     MAX_REPLY_EXPANSIONS_PER_TICK,
     MAX_REPLY_TREE_PAGES,
     SCRAPE_SLEEP_SECONDS,
@@ -32,9 +32,9 @@ from config.settings import (
     TIER_2_EVERY_N_TICKS,
     TIER_3_EVERY_N_TICKS,
 )
-from ingestion.db import Database
-from ingestion.lexicon import load as load_lexicon
-from ingestion.providers import NormalizedTweet, ScraperProvider
+from agents.brand_visibility.x.db import Database
+from agents.brand_visibility.x.lexicon import load as load_lexicon
+from agents.brand_visibility.x.providers import NormalizedTweet, ScraperProvider
 
 logger = logging.getLogger(__name__)
 
@@ -70,13 +70,13 @@ def _load_provider() -> ScraperProvider:
     provider_name = os.environ.get("SCRAPER_PROVIDER", SCRAPER_PROVIDER)
     logger.info(f"DEBUG: Attempting to load provider: {provider_name}")
     if provider_name == "x_official":
-        from ingestion.providers.x_official import XOfficialProvider
+        from agents.brand_visibility.x.providers.x_official import XOfficialProvider
         return XOfficialProvider()
     if provider_name == "twitter_api45":
-        from ingestion.providers.twitter_api45 import TwitterApi45Provider
+        from agents.brand_visibility.x.providers.twitter_api45 import TwitterApi45Provider
         return TwitterApi45Provider()
     if provider_name == "twitter241":
-        from ingestion.providers.twitter241 import Twitter241Provider
+        from agents.brand_visibility.x.providers.twitter241 import Twitter241Provider
         return Twitter241Provider()
     raise ValueError(f"Unknown SCRAPER_PROVIDER={provider_name!r}")
 
@@ -237,7 +237,7 @@ def sweep_keywords(db: Database, dry_run: bool = False, limit: int | None = None
 
             if dry_run:
                 if SCRAPER_PROVIDER == "twitter_api45":
-                    from ingestion.providers.twitter_api45 import _strip_unsupported_operators
+                    from agents.brand_visibility.x.providers.twitter_api45 import _strip_unsupported_operators
                     cleaned, filters = _strip_unsupported_operators(query_str)
                     logger.info(
                         "[DRY-RUN][%s] class %s | cleaned: %s... | stripped: %s",
