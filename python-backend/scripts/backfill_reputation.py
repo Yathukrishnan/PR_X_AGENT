@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import time
 
-from ingestion.db import Database
+from agents.brand_visibility.x.db import Database
 
 
 def main() -> None:

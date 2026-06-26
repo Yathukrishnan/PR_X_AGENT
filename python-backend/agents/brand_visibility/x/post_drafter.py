@@ -1,9 +1,9 @@
 """
 Theme clustering + post drafting for @KiteAI's content pipeline.
 Usage:
-  python -m output.post_drafter --cluster
-  python -m output.post_drafter --draft
-  python -m output.post_drafter --cluster --draft
+  python -m agents.brand_visibility.x.post_drafter --cluster
+  python -m agents.brand_visibility.x.post_drafter --draft
+  python -m agents.brand_visibility.x.post_drafter --cluster --draft
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ import requests
 from pydantic import BaseModel, ValidationError
 
 from config.settings import DRAFTER_MODEL, LLM_SLEEP_SECONDS, OPENROUTER_API_KEY, OPENROUTER_BASE
-from ingestion.db import Database
+from agents.brand_visibility.x.db import Database
 
 logger = logging.getLogger(__name__)
 

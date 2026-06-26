@@ -6,9 +6,13 @@ classified quickly without burning Gemini quota on older backlog.
 import logging
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
-from ingestion.db import Database
-from processing.classifier import CLASSIFIER_MODEL, classify_one, compute_cost
+# Ensure the python-backend root is importable (scripts/ -> parent).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from agents.brand_visibility.x.db import Database
+from agents.brand_visibility.x.classifier import CLASSIFIER_MODEL, classify_one, compute_cost
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger("classify_class_c")

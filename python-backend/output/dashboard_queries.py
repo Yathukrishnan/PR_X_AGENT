@@ -14,7 +14,7 @@ from typing import Any
 import streamlit as st
 
 from config.settings import MAX_API_CALLS_PER_RUN
-from ingestion.db import Database
+from agents.brand_visibility.x.db import Database
 
 
 @st.cache_resource

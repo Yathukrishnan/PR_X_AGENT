@@ -39,7 +39,7 @@ def test_provider_factory_validates_env():
 def test_x_official_capabilities():
     """XOfficialProvider declares full native operator support."""
     with patch.dict(os.environ, {"X_BEARER_TOKEN": "fake_token_for_test"}):
-        from ingestion.providers.x_official import XOfficialProvider
+        from agents.brand_visibility.x.providers.x_official import XOfficialProvider
         provider = XOfficialProvider()
         caps = provider.capabilities
         assert caps.supports_or_grouping_in_query is True
@@ -59,7 +59,7 @@ def test_x_official_capabilities():
 def test_twitter_api45_capabilities():
     """TwitterApi45Provider correctly declares its limitations."""
     with patch.dict(os.environ, {"RAPIDAPI_KEY": "fake_key_for_test"}):
-        from ingestion.providers.twitter_api45 import TwitterApi45Provider
+        from agents.brand_visibility.x.providers.twitter_api45 import TwitterApi45Provider
         provider = TwitterApi45Provider()
         caps = provider.capabilities
         assert caps.supports_or_grouping_in_query is True
@@ -78,7 +78,7 @@ def test_twitter_api45_capabilities():
 
 def test_strip_unsupported_operators():
     """Operators are stripped cleanly; core query survives intact."""
-    from ingestion.providers.twitter_api45 import _strip_unsupported_operators
+    from agents.brand_visibility.x.providers.twitter_api45 import _strip_unsupported_operators
 
     query = "voice AI latency min_faves:1 -is:retweet -is:reply lang:en"
     cleaned, filters = _strip_unsupported_operators(query)
@@ -94,7 +94,7 @@ def test_strip_unsupported_operators():
 
 def test_strip_unsupported_operators_no_operators():
     """Query with no unsupported operators is returned unchanged."""
-    from ingestion.providers.twitter_api45 import _strip_unsupported_operators
+    from agents.brand_visibility.x.providers.twitter_api45 import _strip_unsupported_operators
 
     query = "(voice AI OR speech synthesis) developer"
     cleaned, filters = _strip_unsupported_operators(query)
@@ -109,7 +109,7 @@ def test_strip_unsupported_operators_no_operators():
 
 def test_posthoc_filters_min_faves():
     """Tweets with favorites below threshold are dropped."""
-    from ingestion.providers.twitter_api45 import _apply_posthoc_filters
+    from agents.brand_visibility.x.providers.twitter_api45 import _apply_posthoc_filters
 
     tweets = [
         {"tweet_id": "1", "favorites": 0, "text": "low engagement"},
@@ -132,7 +132,7 @@ def test_posthoc_filters_min_faves():
 
 def test_posthoc_filters_retweets():
     """Tweets starting with 'RT @' are dropped when is_retweet filter active."""
-    from ingestion.providers.twitter_api45 import _apply_posthoc_filters
+    from agents.brand_visibility.x.providers.twitter_api45 import _apply_posthoc_filters
 
     tweets = [
         {"tweet_id": "1", "text": "RT @someone: this is a retweet"},
@@ -155,7 +155,7 @@ def test_posthoc_filters_retweets():
 
 def test_normalize_handles_string_views():
     """'views' as a numeric string becomes impression_count int; empty string → None."""
-    from ingestion.providers.twitter_api45 import _normalize
+    from agents.brand_visibility.x.providers.twitter_api45 import _normalize
 
     base = {
         "tweet_id": "9999",
@@ -189,7 +189,7 @@ def test_normalize_handles_string_views():
 
 def test_normalize_handles_rfc822_dates():
     """RFC 822 created_at string is parsed into a timezone-aware datetime."""
-    from ingestion.providers.twitter_api45 import _normalize
+    from agents.brand_visibility.x.providers.twitter_api45 import _normalize
 
     raw = {
         "tweet_id": "8888",
@@ -216,7 +216,7 @@ def test_normalize_handles_rfc822_dates():
 
 def test_normalize_handles_bad_date_fallback():
     """Unparseable created_at falls back to a timezone-aware now()."""
-    from ingestion.providers.twitter_api45 import _normalize
+    from agents.brand_visibility.x.providers.twitter_api45 import _normalize
 
     raw = {
         "tweet_id": "7777",

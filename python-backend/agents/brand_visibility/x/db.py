@@ -347,7 +347,7 @@ class Database:
         writes to author_reputation (preserving first_seen_at). Idempotent.
         Returns the new reputation row as a dict (empty dict if no tweets).
         """
-        from processing.reputation import (
+        from agents.brand_visibility.x.reputation import (
             compute_promotional_ratio,
             derive_reputation_label,
         )

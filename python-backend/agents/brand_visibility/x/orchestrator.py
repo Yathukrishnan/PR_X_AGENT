@@ -73,16 +73,16 @@ def save_tick_state(tick_number: int) -> None:
 # ---------------------------------------------------------------------------
 
 def tick(tick_number: int, mode: str = "all", dry_run: bool = False) -> dict:
-    from ingestion.db import Database
-    from ingestion.x_scraper import expand_reply_trees, sweep_influencers, sweep_keywords
-    from output.post_drafter import cluster_themes, draft_posts_for_new_themes
-    from processing.classifier import classify_pending
+    from agents.brand_visibility.x.db import Database
+    from agents.brand_visibility.x.x_scraper import expand_reply_trees, sweep_influencers, sweep_keywords
+    from agents.brand_visibility.x.post_drafter import cluster_themes, draft_posts_for_new_themes
+    from agents.brand_visibility.x.classifier import classify_pending
 
     start = datetime.now(timezone.utc)
     logger.info("=== Tick %d start (%s) dry_run=%s mode=%s ===", tick_number, start.isoformat(), dry_run, mode)
 
     from config.settings import MAX_API_CALLS_PER_RUN
-    from ingestion.x_scraper import reset_call_budget
+    from agents.brand_visibility.x.x_scraper import reset_call_budget
     db = Database()
     reset_call_budget(MAX_API_CALLS_PER_RUN)
     run_id = db.start_run(mode=mode, triggered_by="orchestrator")

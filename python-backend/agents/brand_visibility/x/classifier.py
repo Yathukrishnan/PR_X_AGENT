@@ -1,6 +1,6 @@
 """
 Classify PENDING tweets via OpenRouter (Google Gemini Flash 2.5).
-Usage: python -m processing.classifier
+Usage: python -m agents.brand_visibility.x.classifier
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from config.settings import (
     OPENROUTER_API_KEY,
     OPENROUTER_BASE,
 )
-from ingestion.db import Database
+from agents.brand_visibility.x.db import Database
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path
 
-_PROMPTS_DIR = Path(__file__).resolve().parent.parent / "config" / "prompts"
+# config/ lives at the python-backend root: agents/brand_visibility/x/ -> parents[3]
+_PROMPTS_DIR = Path(__file__).resolve().parents[3] / "config" / "prompts"
 _ACTIVE_POINTER = _PROMPTS_DIR / "active.txt"
 _FALLBACK_PROMPT = (
     "You are an analyst classifying X (Twitter) posts for voice AI market relevance. "
@@ -234,7 +235,7 @@ def classify_pending(
         # break classification, so it is fully wrapped.
         if result.intent_signal == "MARKETING":
             try:
-                from processing.promoter_tier import compute_tier, infer_promotion_kind
+                from agents.brand_visibility.x.promoter_tier import compute_tier, infer_promotion_kind
 
                 tier = compute_tier(
                     author_followers=tweet.get("author_followers") or 0,
