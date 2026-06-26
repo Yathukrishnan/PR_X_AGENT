@@ -73,8 +73,8 @@ def run_once(
     sort_by: str = "date_posted",
 ) -> dict:
     """Run a single LinkedIn sweep and return a stats summary."""
-    from linkedin import scraper
-    from linkedin.db import LinkedInDatabase
+    from agents.brand_visibility.linkedin import scraper
+    from agents.brand_visibility.linkedin.db import LinkedInDatabase
 
     run_cap = int(os.getenv("LINKEDIN_MAX_API_CALLS_PER_RUN", "5"))
     monthly_budget = int(os.getenv("LINKEDIN_MONTHLY_BUDGET", "50"))

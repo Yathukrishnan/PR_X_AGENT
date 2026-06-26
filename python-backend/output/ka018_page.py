@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 import pandas as pd
 import streamlit as st
 
-from linkedin.db import LinkedInDatabase
+from agents.brand_visibility.linkedin.db import LinkedInDatabase
 
 MONTHLY_BUDGET = int(os.getenv("LINKEDIN_MONTHLY_BUDGET", "50"))
 

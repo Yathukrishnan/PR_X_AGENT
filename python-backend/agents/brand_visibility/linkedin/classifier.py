@@ -27,7 +27,7 @@ from tenacity import (
 )
 
 from config.settings import OPENROUTER_API_KEY, OPENROUTER_BASE
-from linkedin.db import LinkedInDatabase
+from agents.brand_visibility.linkedin.db import LinkedInDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,8 @@ _ALLOWED_FLAGS = {
 }
 
 # --- System prompt: read once at module load, cached ---
-_PROMPT_PATH = Path(__file__).resolve().parent.parent / "config" / "prompts" / "linkedin_active.txt"
+# config/ lives at the python-backend root: agents/brand_visibility/linkedin/ -> parents[3]
+_PROMPT_PATH = Path(__file__).resolve().parents[3] / "config" / "prompts" / "linkedin_active.txt"
 
 
 def _load_prompt() -> str:

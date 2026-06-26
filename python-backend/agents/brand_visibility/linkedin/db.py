@@ -30,7 +30,8 @@ TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL", "")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN", "")
 TURSO_SYNC_INTERVAL = int(os.getenv("TURSO_SYNC_INTERVAL", "60"))
 
-_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# data/ lives at the python-backend root: agents/brand_visibility/linkedin/ -> parents[3]
+_DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 REPLICA_PATH = _DATA_DIR / "ka018_replica.db"
 
 # Volume is ordinal — used by get_keywords(min_volume=...).
